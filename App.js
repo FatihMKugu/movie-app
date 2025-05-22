@@ -19,6 +19,7 @@ function HomeStack() {
     </Stack.Navigator>
   );
 }
+
 function FavoritesStack() {
   return (
     <Stack.Navigator>
@@ -26,21 +27,20 @@ function FavoritesStack() {
     </Stack.Navigator>
   );
 }
+
 export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={({ route }) => ({
-          headerShown: false, 
+          headerShown: false,
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
-
             if (route.name === 'HomeStack') {
               iconName = focused ? 'home' : 'home-outline';
             } else if (route.name === 'FavoritesStack') {
               iconName = focused ? 'heart' : 'heart-outline';
             }
-
             return <Ionicons name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: 'red',
