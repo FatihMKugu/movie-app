@@ -1,33 +1,39 @@
 import axios from 'axios';
+const TMDB_API_KEY = "eb653865f5ad36beb342c293a6171526";
 
-const TMDB_API_KEY = 'eb653865f5ad36beb342c293a6171526';
+
 const BASE_URL = 'https://api.themoviedb.org/3';
 
 export const fetchPopularMovies = async () => {
-  const page1 = await axios.get(`${BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=tr-TR&page=1`);
-  const page2 = await axios.get(`${BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=tr-TR&page=2`);
+  const page1 = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=tr-TR&page=1`);
+  const page2 = await axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=tr-TR&page=2`);
 
   const list1 = page1.data.results;
   const list2 = page2.data.results;
 
+  // Sayfa 2'den ilk eşsiz (duplicate olmayan) filmi bul
   const extra = list2.find(item2 => !list1.some(item1 => item1.id === item2.id));
-  return [...list1, extra].filter(Boolean);
+
+  const combined = [...list1, extra].filter(Boolean); // null olursa düşür
+  return combined;
 };
+
 
 export const fetchGenres = async () => {
   const response = await axios.get(`${BASE_URL}/genre/movie/list?api_key=${TMDB_API_KEY}&language=tr-TR`);
   return response.data.genres;
 };
-
 export const fetchMoviesByGenre = async (genreId) => {
-  const page1 = await axios.get(`${BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=tr-TR&with_genres=${genreId}&page=1`);
-  const page2 = await axios.get(`${BASE_URL}/discover/movie?api_key=${TMDB_API_KEY}&language=tr-TR&with_genres=${genreId}&page=2`);
+  const page1 = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&language=tr-TR&with_genres=${genreId}&page=1`);
+  const page2 = await axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&language=tr-TR&with_genres=${genreId}&page=2`);
 
   const list1 = page1.data.results;
   const list2 = page2.data.results;
 
   const extra = list2.find(item2 => !list1.some(item1 => item1.id === item2.id));
-  return [...list1, extra].filter(Boolean);
+
+  const combined = [...list1, extra].filter(Boolean);
+  return combined;
 };
 
 export const fetchMovieDetails = async (movieId) => {
@@ -44,4 +50,16 @@ export const fetchMovieTrailer = async (movieId) => {
 export const fetchMovieCredits = async (movieId) => {
   const response = await axios.get(`${BASE_URL}/movie/${movieId}/credits?api_key=${TMDB_API_KEY}&language=tr-TR`);
   return response.data.cast;
+};
+
+export const searchMovies = async (query) => {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/search/movie?query=${encodeURIComponent(query)}&api_key=${TMDB_API_KEY}&language=tr-TR`
+    );
+    return response.data.results;
+  } catch (error) {
+    console.error('Arama hatası:', error);
+    return [];
+  }
 };

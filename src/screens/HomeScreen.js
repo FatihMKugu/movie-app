@@ -1,169 +1,151 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  View, Text, FlatList, ActivityIndicator, StyleSheet, 
-  TouchableOpacity, Modal, Pressable, ScrollView 
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  ActivityIndicator,
+  TouchableOpacity,
+  Platform,
+  SafeAreaView,
+  TextInput,
 } from 'react-native';
-import { fetchPopularMovies, fetchGenres, fetchMoviesByGenre } from '../api/tmdb';
+import { fetchPopularMovies, fetchMoviesByGenre, fetchGenres } from '../api/tmdb';
 import MovieCard from '../components/MovieCard';
+
+const { width } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const [movies, setMovies] = useState([]);
   const [genres, setGenres] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [genreModalVisible, setGenreModalVisible] = useState(false);
-
-  const loadPopular = async () => {
-    const data = await fetchPopularMovies();
-    setMovies(data);
-  };
-
-  const loadGenres = async () => {
-    const data = await fetchGenres();
-    setGenres(data);
-  };
-
-  const loadByGenre = async (genreId) => {
-    const data = await fetchMoviesByGenre(genreId);
-    setMovies(data);
-  };
 
   useEffect(() => {
-    loadGenres();
-    loadPopular().then(() => setLoading(false));
+    const loadData = async () => {
+      const genreData = await fetchGenres();
+      setGenres(genreData);
+      const movieData = await fetchPopularMovies();
+      setMovies(movieData);
+      setLoading(false);
+    };
+    loadData();
   }, []);
 
-  const padListToFullRow = (list, columns = 3) => {
-    const remainder = list.length % columns;
-    if (remainder === 0) return list;
-    const padding = Array.from({ length: columns - remainder }, (_, i) => ({
-      id: `placeholder-${i}`,
-      placeholder: true,
-    }));
-    return [...list, ...padding];
-  };
-
-  const onGenreSelect = async (genre) => {
-    setGenreModalVisible(false);
-    setSelectedGenre(genre);
+  const handleGenreSelect = async (genreId) => {
     setLoading(true);
-    if (genre) {
-      await loadByGenre(genre.id);
-    } else {
-      await loadPopular();
-    }
+    setSelectedGenre(genreId);
+    const data = genreId ? await fetchMoviesByGenre(genreId) : await fetchPopularMovies();
+    setMovies(data);
     setLoading(false);
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="blue" style={{ marginTop: 40 }} />;
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="red" />
+      </View>
+    );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.headerRow}>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.header}>
         <Text style={styles.title}>
-          {selectedGenre ? `${selectedGenre.name} Filmleri` : 'Popüler Filmler'}
+          {selectedGenre
+            ? genres.find((g) => g.id === selectedGenre)?.name
+            : 'Popüler Filmler'}
         </Text>
-        <TouchableOpacity onPress={() => setGenreModalVisible(true)} style={styles.filterButton}>
-          <Text style={styles.filterText}>Tür Seç</Text>
-        </TouchableOpacity>
+        <FlatList
+          horizontal
+          data={genres}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.genreList}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => handleGenreSelect(item.id)}
+              style={[
+                styles.genreButton,
+                selectedGenre === item.id && styles.genreButtonActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.genreText,
+                  selectedGenre === item.id && styles.genreTextActive,
+                ]}
+              >
+                {item.name}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
       </View>
 
       <FlatList
-        key={'grid'}
-        data={padListToFullRow(movies)}
-        keyExtractor={(item) => item.id.toString()}
+        data={movies}
         numColumns={3}
+        keyExtractor={(item) => item.id.toString()}
+        columnWrapperStyle={{ justifyContent: 'space-between' }}
+        contentContainerStyle={styles.movieList}
         renderItem={({ item }) => (
-          item.placeholder ? <View style={{ flex: 1, margin: 5 }} /> : (
-            <MovieCard
-              movie={item}
-              onPress={() => navigation.navigate('MovieDetail', { movie: item })}
-            />
-          )
+          <MovieCard
+            movie={item}
+            onPress={() => navigation.navigate('MovieDetail', { movie: item })}
+          />
         )}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={{ paddingBottom: 20 }}
       />
-
-      <Modal visible={genreModalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Film Türü Seç</Text>
-
-            <ScrollView style={{ maxHeight: 300 }}>
-              <Pressable onPress={() => onGenreSelect(null)}>
-                <Text style={styles.genreItem}>Popüler Filmler</Text>
-              </Pressable>
-
-              {genres.map((genre) => (
-                <Pressable key={genre.id} onPress={() => onGenreSelect(genre)}>
-                  <Text style={styles.genreItem}>{genre.name}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-
-            <Pressable onPress={() => setGenreModalVisible(false)} style={styles.modalClose}>
-              <Text style={{ fontWeight: 'bold' }}>Kapat</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 8, backgroundColor: '#fff' },
-  title: { fontSize: 20, fontWeight: 'bold' },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 10,
-    paddingHorizontal: 4,
-  },
-  filterButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-  },
-  filterText: {
-    color: 'white',
-    fontSize: 14,
-  },
-  row: { justifyContent: 'space-between' },
-  modalOverlay: {
+  safeArea: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? 30 : 0,
   },
-  modalContainer: {
-    marginHorizontal: 20,    // 40'tan 20'ye indirildi, daha geniş oldu
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 8,
-    elevation: 5,
-    maxHeight: '85%',        // Önce 70%'di, şimdi 85% yaptım, daha uzun
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  header: {
+    paddingHorizontal: 12,
     marginBottom: 10,
   },
-  genreItem: {
-    fontSize: 16,
-    paddingVertical: 6,
-    borderBottomWidth: 0.5,
-    borderColor: '#ccc',
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
-  modalClose: {
-    marginTop: 10,
+  genreList: {
+    paddingVertical: 6,
+  },
+  genreButton: {
+    backgroundColor: '#eee',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  genreButtonActive: {
+    backgroundColor: 'red',
+  },
+  genreText: {
+    fontSize: 14,
+    color: '#333',
+  },
+  genreTextActive: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  movieList: {
+    paddingHorizontal: 12,
+    paddingBottom: 20,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
   },
 });
-
 
 export default HomeScreen;
