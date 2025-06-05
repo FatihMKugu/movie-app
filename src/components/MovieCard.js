@@ -20,12 +20,12 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     margin: 5,
-    maxWidth: '31%', // %33 olursa sonuncu taşar
+    maxWidth: '31%', 
     alignItems: 'center',
   },
   image: {
     width: '100%',
-    aspectRatio: 2 / 3, // dik afiş için ideal
+    aspectRatio: 2 / 3, 
     borderRadius: 8,
   },
   title: {

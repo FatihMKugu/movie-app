@@ -1,25 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  StyleSheet,
-  ActivityIndicator,
-  Dimensions,
-  TouchableOpacity,
-  Platform,
-  StatusBar
-} from 'react-native';
+import { View,Text,ScrollView,Image,StyleSheet,ActivityIndicator,Dimensions,TouchableOpacity,Platform,StatusBar} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MovieInfo from '../../assets/MovieInfo.png';
 import { WebView } from 'react-native-webview';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {
-  fetchMovieDetails,
-  fetchMovieTrailer,
-  fetchMovieCredits,
-} from '../api/tmdb';
+import {fetchMovieDetails,fetchMovieTrailer,fetchMovieCredits,} from '../api/tmdb';
 import { FavoritesContext } from '../context/FavoritesContext';
 
 const { width } = Dimensions.get('window');

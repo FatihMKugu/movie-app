@@ -11,10 +11,9 @@ export const fetchPopularMovies = async () => {
   const list1 = page1.data.results;
   const list2 = page2.data.results;
 
-  // Sayfa 2'den ilk eşsiz (duplicate olmayan) filmi bul
   const extra = list2.find(item2 => !list1.some(item1 => item1.id === item2.id));
 
-  const combined = [...list1, extra].filter(Boolean); // null olursa düşür
+  const combined = [...list1, extra].filter(Boolean);
   return combined;
 };
 

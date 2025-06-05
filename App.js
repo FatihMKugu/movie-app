@@ -13,7 +13,6 @@ import { FavoritesProvider } from './src/context/FavoritesContext'; // context
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Ana Sayfa Stack
 function HomeStack() {
   return (
     <Stack.Navigator>
@@ -23,8 +22,6 @@ function HomeStack() {
   );
 }
 
-
-// Listem Stack
 function ListStack() {
   return (
     <Stack.Navigator>
