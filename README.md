@@ -19,5 +19,5 @@ Film Detayları:
 Kullanıcı bir film seçtiğinde, o filmin detay sayfası açılır. Detay sayfasında film ismi, açıklaması, çıkış tarihi, puanı gibi bilgiler gösterilir. Aynı zamanda filmleri favorilere ekleyebilir veya izlenecek filmler listesine eklenebilir
 
 Arama sayfası:
-İstenirse ana sayfaya film ismine göre arama özelliği eklenebilir.
+İstediğimiz filmi ismiyle aratarak bulabilirsiniz.
 
