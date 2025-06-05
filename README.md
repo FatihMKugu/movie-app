@@ -16,8 +16,8 @@ Ana Sayfa:
 Uygulama açıldığında kullanıcıya popüler filmler listelenir. Her film kartına tıklanarak detay sayfasına gidilebilir.
 
 Film Detayları:
-Kullanıcı bir film seçtiğinde, o filmin detay sayfası açılır. Detay sayfasında film ismi, açıklaması, çıkış tarihi, puanı gibi bilgiler gösterilir. Aynı zamanda filmleri favorilere ekleyebilir veya izlenecek filmler listesine eklenebilir
+Kullanıcı bir film seçtiğinde, o filmin detay sayfası açılır. Detay sayfasında film ismi, açıklaması, çıkış tarihi, puanı gibi bilgiler gösterilir. Aynı zamanda filmleri favorilere eklenebilir veya izlenecek filmler listesine eklenebilir
 
 Arama sayfası:
-İstediğimiz filmi ismiyle aratarak bulabilirsiniz.
+İstediğiniz filmi ismiyle aratarak bulabilirsiniz.
 
